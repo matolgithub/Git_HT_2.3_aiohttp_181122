@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15.0
+    ports:
+      - "5431:5432"
+    environment:
+      - POSTGRES_USER=aiohttp_user
+      - POSTGRES_PASSWORD=aiohttp_pswd
+      - POSTGRES_DB=aiohttp_db
