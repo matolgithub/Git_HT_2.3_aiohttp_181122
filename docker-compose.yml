@@ -1,11 +1,39 @@
 version: "3.9"
 
+networks:
+  dev_network:
+
 services:
   db:
     image: postgres:15.0
     ports:
       - "5431:5432"
     environment:
-      - POSTGRES_USER=aiohttp_user
-      - POSTGRES_PASSWORD=aiohttp_pswd
-      - POSTGRES_DB=aiohttp_db
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: app_db
+    networks:
+      dev_network:
+        aliases:
+          - postgre
+
+  app:
+    build:
+      context: .
+    environment:
+      PG_USER: ${PG_USER}
+      PG_PASSWORD: ${PG_PASSWORD}
+      PG_HOST: ${PG_HOST}
+      PG_PORT: ${PG_PORT}
+      PG_DB: ${PG_DB}
+      WAIT_HOSTS: ${PG_HOST}:${PG_PORT}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      dev_network:
+        aliases:
+          - api
+    volumes:
+      - ./app:/app
