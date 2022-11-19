@@ -83,3 +83,77 @@ async def login(request: web.Request):
     await request["session"].commit()
 
     return web.json_response({"token": str(token.id)})
+
+
+class AdsView(web.View):
+    async def get(self):
+        advertisement_id = int(self.request.match_info["advertisement_id"])
+        advertisement = await get_orm_item(Advertisement, advertisement_id, self.request["session"])
+        return web.json_response(
+            {"id": advertisement.id, "title": advertisement.title, "description": advertisement.description,
+             "creation_date": int(advertisement.creation_date.timestamp()), "owner": advertisement.owner}
+        )
+
+    async def post(self):
+        ads_data = await self.request.json()
+        new_ads = Advertisement(**ads_data)
+        self.request["session"].add(new_ads)
+        await self.request["session"].commit()
+        return web.json_response({"id": new_ads.id})
+
+    async def patch(self):
+        ads_id = int(self.request.match_info["ads_id"])
+        user_id = int(self.request.match_info["user_id"])
+        check_owner(self.request, user_id=user_id)
+        ads_data = await self.request.json()
+        ads = await get_orm_item(item_class=Advertisement, item_id=ads_id, session=self.request["session"])
+        for field, value in ads_data.items():
+            setattr(__obj=ads, __name=field, __value=value)
+            self.request["sessiom"].add(ads)
+            await self.request["session"].commit()
+
+            return web.json_response({"status": "success"})
+
+    async def delete(self):
+        ads_id = int(self.request.match_info["ads_id"])
+        user_id = int(self.request.match_info["user_id"])
+        check_owner(request=self.request, user_id=user_id)
+        del_ads = await get_orm_item(item_class=Advertisement, item_id=ads_id, session=self.request["session"])
+        await self.request["session"].delete(del_ads)
+        await self.request["session"].commit()
+        return web.json_response({"status": "success"})
+
+
+async def app_context(app: web.Application):
+    print("--------------start process!--------------")
+    async with engine.begin() as conn:
+        async with Session() as session:
+            # await session.execute("CREATE EXTENSION IF NOT EXISTS 'uuid-ossp'")
+            await session.commit()
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+    await engine.dispose()
+    print("--------------finish process!--------------")
+
+
+async def get_app():
+    app = web.Application(middlewares=[session_middleware])
+    app_auth_required = web.Application(middlewares=[session_middleware, auth_middleware])
+
+    app.cleanup_ctx.append(app_context)
+    app.add_routes(
+        [
+            web.get("/{ads_id:\d+}", AdsView),
+            web.post("/advertisements/", AdsView)
+        ]
+    )
+    app_auth_required.add_routes(
+        [
+            web.patch("/{ads_id:\d+}", AdsView),
+            web.delete("/{ads_id:\d+}", AdsView)
+        ]
+    )
+
+    app.add_subapp(prefix="/advertisements", subapp=app_auth_required)
+
+    return app
