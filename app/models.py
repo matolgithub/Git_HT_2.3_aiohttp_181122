@@ -13,6 +13,8 @@ class Advertisement(Base):
     title = Column(String(50), index=True, nullable=False)
     description = Column(String(300), nullable=False)
     creation_date = Column(DateTime, server_default=func.now())
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+    owner = relationship("User", lazy="joined")
 
 
 class User(Base):
@@ -22,8 +24,6 @@ class User(Base):
     name = Column(String(64), unique=True, nullable=False)
     password = Column(String(60), nullable=False)
     user_creation_time = Column(DateTime, server_default=func.now())
-    advertisement_id = Column(Integer, ForeignKey("advertisements.id", ondelete="CASCADE"))
-    advertisement = relationship("Advertisement", lazy="joined")
 
 
 class Token(Base):
