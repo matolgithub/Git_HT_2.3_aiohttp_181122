@@ -1,0 +1,38 @@
+# API-запросы
+
+@baseUrl = http://0.0.0.0:8080
+
+# создание объявления
+POST {{baseUrl}}/ads/
+Content-Type: application/json
+
+{
+  "title": "Продам дом",
+  "description": "Самый красивый дом в районе.",
+  "owner": "Пользователь_1"
+}
+
+###
+
+# получение объявления
+GET {{baseUrl}}/ads/1
+Content-Type: application/json
+
+###
+
+# обновление объявления
+PATCH {{baseUrl}}/ads/1/
+Content-Type: application/json
+
+{
+  "title": "Продам дом с участком",
+  "description": "Самый красивый дом в районе. 3 этажа. 500 м.кв."
+}
+
+###
+
+# удаление объявления
+DELETE {{baseUrl}}/ads/2/
+Content-Type: application/json
+
+###

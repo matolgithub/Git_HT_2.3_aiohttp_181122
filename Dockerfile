@@ -1,4 +1,11 @@
 FROM python:3.10.6
+
+LABEL maintainer="matol 888888@888.ru"
+
+ENV TZ=Europe/Moscow
+
+RUN pip install --upgrade pip
+
 COPY ./app /app
 
 WORKDIR /app
