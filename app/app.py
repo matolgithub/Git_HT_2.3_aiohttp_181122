@@ -1,3 +1,4 @@
+from os import getenv
 import datetime
 import json
 from typing import Type, Callable, Awaitable
@@ -9,8 +10,13 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
-from config import PG_DSN, TOKEN_TTL
+# from dotenv import load_dotenv
 from models import Base, Advertisement, User, Token
+
+# load_dotenv()
+
+PG_DSN = getenv("PG_DSN")
+TOKEN_TTL = getenv("TOKEN_TTL")
 
 engine = create_async_engine(PG_DSN)
 

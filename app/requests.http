@@ -1,9 +1,9 @@
 # API-запросы
 
-@baseUrl = http://0.0.0.0:8080
+@baseUrl = http://0.0.0.0:9000
 
 # создание объявления
-POST {{baseUrl}}/ads/
+POST {{baseUrl}}/advertisements/
 Content-Type: application/json
 
 {

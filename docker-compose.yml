@@ -1,39 +1,31 @@
 version: "3.9"
-
-networks:
-  dev_network:
-
 services:
   db:
     image: postgres:15.0
     ports:
       - "5431:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./logs:/var/log
     environment:
-      POSTGRES_USER: app_user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: app_db
-    networks:
-      dev_network:
-        aliases:
-          - postgre
-
+      - POSTGRES_USER=hello_aiohttp
+      - POSTGRES_PASSWORD=hello_aiohttp
+      - POSTGRES_DB=aiohttp_db
   app:
-    build:
-      context: .
-    environment:
-      PG_USER: ${PG_USER}
-      PG_PASSWORD: ${PG_PASSWORD}
-      PG_HOST: ${PG_HOST}
-      PG_PORT: ${PG_PORT}
-      PG_DB: ${PG_DB}
-      WAIT_HOSTS: ${PG_HOST}:${PG_PORT}
+    build: ./app
+    command: gunicorn app:get_app -b 0.0.0.0:9000
+#    command: gunicorn app:get_app --bind 0.0.0.0:9000 --worker-class aiohttp.GunicornWebWorker --capture-output
     ports:
-      - "8080:8080"
+      - "9000:9000"
+    env_file:
+      - ./.env
     depends_on:
       - db
-    networks:
-      dev_network:
-        aliases:
-          - api
-    volumes:
-      - ./app:/app
+  nginx:
+    build: nginx
+    ports:
+      - "1337:80"
+    depends_on:
+      - app
+volumes:
+  postgres_data:
