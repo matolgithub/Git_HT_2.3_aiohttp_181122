@@ -16,6 +16,8 @@ class Advertisement(Base):
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
     owner = relationship("User", lazy="joined")
 
+    __mapper_args__ = {"eager_defaults": True}
+
 
 class User(Base):
     __tablename__ = "users"
@@ -25,11 +27,4 @@ class User(Base):
     password = Column(String(60), nullable=False)
     user_creation_time = Column(DateTime, server_default=func.now())
 
-
-class Token(Base):
-    __tablename__ = "tokens"
-
-    id = Column(UUID, server_default=func.uuid_generate_v4(), primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
-    user = relationship("User", lazy="joined")
-    token_creation_time = Column(DateTime, server_default=func.now())
+    __mapper_args__ = {"eager_defaults": True}

@@ -4,28 +4,9 @@ services:
     image: postgres:15.0
     ports:
       - "5431:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./logs:/var/log
+    env_file:
+      - .env
     environment:
       - POSTGRES_USER=hello_aiohttp
       - POSTGRES_PASSWORD=hello_aiohttp
       - POSTGRES_DB=aiohttp_db
-  app:
-    build: ./app
-    command: gunicorn app:get_app -b 0.0.0.0:9000
-#    command: gunicorn app:get_app --bind 0.0.0.0:9000 --worker-class aiohttp.GunicornWebWorker --capture-output
-    ports:
-      - "9000:9000"
-    env_file:
-      - ./.env
-    depends_on:
-      - db
-  nginx:
-    build: nginx
-    ports:
-      - "1337:80"
-    depends_on:
-      - app
-volumes:
-  postgres_data:

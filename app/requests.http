@@ -1,18 +1,33 @@
 # API-запросы
 
-@baseUrl = http://0.0.0.0:9000
+@baseUrl = http://127.0.0.1:7000
+
+###
+
+# проверка работоспособности и состояния через запрос на главную страницу
+{{baseUrl}}/
+Content-Type: application/json
+
+###
 
 # создание объявления
-POST {{baseUrl}}/advertisements/
+POST {{baseUrl}}/ads/
 Content-Type: application/json
 
 {
   "title": "Продам дом",
   "description": "Самый красивый дом в районе.",
-  "owner": "Пользователь_1"
+  "owner": "Пользователь_3",
 }
 
 ###
+
+# получение объявлений
+GET {{baseUrl}}/advertisements
+Content-Type: application/json
+
+###
+
 
 # получение объявления
 GET {{baseUrl}}/ads/1
