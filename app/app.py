@@ -70,8 +70,8 @@ class AdsView(web.View):
 
         return web.json_response(
             {"id": advertisement.id, "title": advertisement.title, "description": advertisement.description,
-             "creation_date": int(advertisement.creation_date.timestamp()), "owner": advertisement.owner}
-        )
+             "creation_date": int(advertisement.creation_date.timestamp()), "user_id": advertisement.user_id,
+             "owner": advertisement.owner})
 
     async def post(self):
         ads_data = await self.request.json()
@@ -84,9 +84,9 @@ class AdsView(web.View):
     async def patch(self):
         ads_id = int(self.request.match_info["ads_id"])
         ads_data = await self.request.json()
-        ads = await get_orm_item(item_class=Advertisement, item_id=ads_id, session=self.request["session"])
+        ads = await get_orm_item(Advertisement, ads_id, self.request["session"])
         for field, value in ads_data.items():
-            setattr(__obj=ads, __name=field, __value=value)
+            setattr(ads, field, value)
             self.request["session"].add(ads)
             await self.request["session"].commit()
 
@@ -105,7 +105,6 @@ async def app_context(app: web.Application):
     print("--------------start process!--------------")
     async with engine.begin() as conn:
         async with Session() as session:
-            #         # await session.execute('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"')
             await session.commit()
         await conn.run_sync(Base.metadata.create_all)
     yield
@@ -119,7 +118,6 @@ if __name__ == "__main__":
     app.add_routes(
         [
             web.get("/", IndexView),
-            web.get("/advertisements", AdsAllView),
             web.get("/ads/{ads_id:\d+}", AdsView),
             web.post("/ads/", AdsView),
             web.patch("/ads/{ads_id:\d+}", AdsView),
