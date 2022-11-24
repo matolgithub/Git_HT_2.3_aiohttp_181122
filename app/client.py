@@ -65,7 +65,7 @@ async def main():
 
     response = await create_advertisement()
     print(response)
-    # The result is: {"id": 1}, {"id": 2}, {"id": 2} - from requests.txt
+    # The result is: {"id": 1}, {"id": 2}, {"id": 2} - from requests.http
 
     response = await patch_advertisement()
     print(response)

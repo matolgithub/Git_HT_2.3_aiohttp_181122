@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from dotenv import load_dotenv
 
 from models import Base, Advertisement, User
-from sqlalchemy.future import select
+
 
 load_dotenv()
 
@@ -48,18 +48,6 @@ async def session_middleware(
 class IndexView(web.View):
     async def get(self):
         return web.json_response({'index_page': 'successfully'})
-
-
-class AdsAllView(web.View):
-
-    async def get(self, session):
-        try:
-            result = await session.execute(select(Advertisement).order_by(Advertisement.id))
-            ads = result.scalars().first()
-            print(f"Response for the get all advertisments request: {ads.data}.")
-            return web.json_response({"Ads": ads.data})
-        except AttributeError:
-            return web.json_response({"The result": "No one ads"})
 
 
 class AdsView(web.View):
